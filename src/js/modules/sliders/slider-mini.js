@@ -5,6 +5,7 @@ import Slider from "./slider";
 export default class MiniSlider extends Slider {
 	constructor(container, next, prev, activeClass, animate, autoplay) {
 		super(container, next, prev, activeClass, animate, autoplay);
+		this.paused = false;
 	}
 
 	decorizeSlides() {
@@ -58,16 +59,19 @@ export default class MiniSlider extends Slider {
 	}
 
 	bindTriggers() {
-
 		// Listener get first elem(child) in container and put them in the end of container
-		this.next.addEventListener('click', () => {
-			this.nextSlide();
-		});
-
+		this.next.addEventListener('click', () => this.nextSlide());
 		// Listener get last elem(child) in container and put them before the first one elem(child)
-		this.prev.addEventListener('click', () => {
-			this.prevSlide(); 
-		});
+		this.prev.addEventListener('click', () => this.prevSlide());
+	}
+
+	// Func starts autoplay and stops it when mouseenter the elems inside the array
+	autoplayStart() {
+		let autoplay = setInterval(() => this.nextSlide(), 5000);
+
+		[this.slides[0].parentNode, this.next, this.prev].forEach(elem => {
+			elem.addEventListener('mouseenter', () => clearInterval(autoplay));
+		});	
 	}
 
 	init() {
@@ -81,5 +85,13 @@ export default class MiniSlider extends Slider {
 		this.bindTriggers();
 		// First call to get styles for the first element
 		this.decorizeSlides();
+
+		if (this.autoplay) {
+			this.autoplayStart();
+
+			[this.slides[0].parentNode, this.next, this.prev].forEach(elem => {
+				elem.addEventListener('mouseleave', () => this.autoplayStart());
+			});	
+		}
 	}
 }
