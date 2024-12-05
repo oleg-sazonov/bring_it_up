@@ -12,10 +12,14 @@ export default class VideoPlayer {
 			btn.addEventListener('click', () => {
 				if (document.querySelector('iframe#frame')) {
 					this.overlay.style.display = 'flex';
+					if (this.path !== btn.getAttribute('data-url')) {
+						this.path = btn.getAttribute('data-url');
+						this.player.loadVideoById({videoId: this.path});
+					}
 				} else {
-					const path = btn.getAttribute('data-url');
+					this.path = btn.getAttribute('data-url');
 				
-					this.createPlayer(path);
+					this.createPlayer(this.path);
 					this.overlay.classList.remove('animate__fadeOut');
 					this.overlay.classList.add('animate__fadeIn');
 				}
@@ -54,13 +58,15 @@ export default class VideoPlayer {
 	}
 
 	init() {
-		const tag = document.createElement('script');
+		if (this.buttons.length > 0) {
+			const tag = document.createElement('script');
 
-		tag.src = "https://www.youtube.com/iframe_api";
-		const firstScriptTag = document.getElementsByTagName('script')[0];
-		firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-		this.bindTriggers();
-		this.bindCloseTriggers();
+			tag.src = "https://www.youtube.com/iframe_api";
+			const firstScriptTag = document.getElementsByTagName('script')[0];
+			firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+	
+			this.bindTriggers();
+			this.bindCloseTriggers();
+		}
 	}
 }
